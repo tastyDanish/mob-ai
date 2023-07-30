@@ -14,10 +14,11 @@ export const saveOrUpdateWord = async (word: string, isPositive: boolean) => {
   }
 };
 
-export const getTopPhrases = async (isTop: boolean, limit: number) => {
+export const getPhrases = async (isTop: boolean, limit: number) => {
   try {
     const sortDirection = isTop ? -1 : 1;
-    const phrases = await Word.find({})
+    const condition = isTop ? { $gt: 0 } : { $lte: 0 };
+    const phrases = await Word.find({ count: condition })
       .sort({ count: sortDirection })
       .limit(limit);
     return phrases;

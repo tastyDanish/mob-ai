@@ -1,11 +1,19 @@
 import express, { Request, Response } from "express";
+import http from "https";
+import WebSocket from "ws";
 import cors from "cors";
 import connectDB from "./db";
-import { saveOrUpdateWord } from "./models/wordMethods";
+import { getPhrases, saveOrUpdateWord } from "./models/wordMethods";
+import Word, { WordDocument } from "./models/wordModel";
+import { arraysAreEqual } from "./utils/arrayUtils";
+
+let previousTopPhrases: WordDocument[] = [];
+let previousBottomPhrases: WordDocument[] = [];
 
 const app = express();
 const port = 5001;
-
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 connectDB();
 app.use(express.json());
 
@@ -35,6 +43,50 @@ app.post("/words", async (req: Request, res: Response) => {
     return res.status(500).json({ error: "sever error" });
   }
 });
+
+wss.on("connection", (ws: WebSocket) => {
+  console.log("websocket client connected");
+
+  sendDataToClient(ws);
+
+  const changeStream = Word.watch();
+
+  // Listen for change events
+  changeStream.on("change", (change) => {
+    if (
+      change.operationType === "update" ||
+      change.operationType === "insert"
+    ) {
+      // Update or insert event occurred, send data to clients
+      sendDataToClient(ws);
+    }
+  });
+});
+
+const sendDataToClient = async (ws: WebSocket) => {
+  try {
+    const topPhrases = await getPhrases(true, 20);
+    const bottomPhrases = await getPhrases(false, 20);
+
+    // Compare new results with previous results
+    const topPhrasesChanged = !arraysAreEqual(previousTopPhrases, topPhrases);
+    const bottomPhrasesChanged = !arraysAreEqual(
+      previousBottomPhrases,
+      bottomPhrases
+    );
+
+    if (topPhrasesChanged || bottomPhrasesChanged) {
+      // Notify the WebSocket clients about the updated data
+      ws.send(JSON.stringify({ top: topPhrases, bottom: bottomPhrases }));
+
+      // Update the previous phrases with the current ones
+      previousTopPhrases = topPhrases;
+      previousBottomPhrases = bottomPhrases;
+    }
+  } catch (error) {
+    console.error("Error sending data to client:", error);
+  }
+};
 
 app.listen(port, () => {
   console.log(`Backend server is running on port ${port}`);

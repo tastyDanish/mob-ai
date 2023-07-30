@@ -5,7 +5,7 @@ interface WordAttributes {
   count: number;
 }
 
-interface WordDocument extends WordAttributes, Document {}
+export interface WordDocument extends WordAttributes, Document {}
 
 interface WordModel extends Model<WordDocument> {}
 
