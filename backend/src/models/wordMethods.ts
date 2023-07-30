@@ -1,6 +1,6 @@
 import Word from "./wordModel";
 
-export const saveOrUpdateWord = async (word: string) => {
+export const saveOrUpdateWord = async (word: string, isPositive: boolean) => {
   try {
     const existingWord = await Word.findOne({ word });
     if (existingWord) {
@@ -14,12 +14,15 @@ export const saveOrUpdateWord = async (word: string) => {
   }
 };
 
-export const getTopPhrases = async () => {
+export const getTopPhrases = async (isTop: boolean, limit: number) => {
   try {
-    const topPhrases = await Word.find({}).sort({ count: -1 }).limit(20);
-    return topPhrases;
+    const sortDirection = isTop ? -1 : 1;
+    const phrases = await Word.find({})
+      .sort({ count: sortDirection })
+      .limit(limit);
+    return phrases;
   } catch (error) {
-    console.error("Error fetching top phrases:", error);
+    console.error("Error fetching phrases:", error);
     throw error;
   }
 };
