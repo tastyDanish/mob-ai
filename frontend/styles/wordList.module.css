@@ -1,0 +1,24 @@
+.wordContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.positive {
+  align-items: flex-end;
+}
+
+.word {
+  background-color: lightcoral;
+  color: white;
+  height: fit-content;
+  width: fit-content;
+  border-radius: 5px;
+  padding: 3px 15px;
+}
+
+.positive .word {
+  background-color: lightgreen;
+  color: black;
+}

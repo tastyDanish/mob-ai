@@ -8,7 +8,7 @@ export const saveOrUpdateWord = async (word: string, isPositive: boolean) => {
       await existingWord.save();
       return existingWord;
     } else {
-      return Word.create({ word });
+      return Word.create({ word: word, count: isPositive ? 1 : -1 });
     }
   } catch (error) {
     console.error("Error saving or updating word:", error);

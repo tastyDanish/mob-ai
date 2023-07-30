@@ -51,8 +51,8 @@ wss.on("connection", (ws: WebSocket) => {
 
 const sendDataToClient = async () => {
   try {
-    const topPhrases = await getPhrases(true, 20);
-    const bottomPhrases = await getPhrases(false, 20);
+    const topPhrases = await getPhrases(true, 10);
+    const bottomPhrases = await getPhrases(false, 10);
 
     // Compare new results with previous results
     const topPhrasesChanged = !arraysAreEqual(previousTopPhrases, topPhrases);
