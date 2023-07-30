@@ -1,0 +1,13 @@
+{
+  "name": "my-fullstack-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start:frontend": "cd frontend && npm run dev",
+    "start:backend": "cd backend && ts-node-dev --respawn src/index.ts",
+    "start:dev": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.2",
+    "ts-node-dev": "^1.1.8"
+  }
+}
