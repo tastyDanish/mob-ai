@@ -11,3 +11,16 @@ export const fetchData = async (endpoint: string) => {
     return null;
   }
 };
+
+export const addWord = async (word: string, isPositive: boolean) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/words`, {
+      word,
+      isPositive,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error posting word:", error);
+    return null;
+  }
+};

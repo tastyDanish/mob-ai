@@ -1,10 +1,9 @@
 import express, { Request, Response } from "express";
-import http from "https";
 import WebSocket from "ws";
 import cors from "cors";
 import connectDB from "./db";
 import { getPhrases, saveOrUpdateWord } from "./models/wordMethods";
-import Word, { WordDocument } from "./models/wordModel";
+import { WordDocument } from "./models/wordModel";
 import { arraysAreEqual } from "./utils/arrayUtils";
 
 let previousTopPhrases: WordDocument[] = [];
@@ -12,8 +11,7 @@ let previousBottomPhrases: WordDocument[] = [];
 
 const app = express();
 const port = 5001;
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ port: 5002 });
 connectDB();
 app.use(express.json());
 
@@ -37,6 +35,7 @@ app.post("/words", async (req: Request, res: Response) => {
 
   try {
     const savedWord = await saveOrUpdateWord(word, isPositive);
+    sendDataToClient();
     return res.status(201).json(savedWord);
   } catch (error) {
     console.error("Error saving or updating word:", error);
@@ -47,23 +46,10 @@ app.post("/words", async (req: Request, res: Response) => {
 wss.on("connection", (ws: WebSocket) => {
   console.log("websocket client connected");
 
-  sendDataToClient(ws);
-
-  const changeStream = Word.watch();
-
-  // Listen for change events
-  changeStream.on("change", (change) => {
-    if (
-      change.operationType === "update" ||
-      change.operationType === "insert"
-    ) {
-      // Update or insert event occurred, send data to clients
-      sendDataToClient(ws);
-    }
-  });
+  sendDataToClient();
 });
 
-const sendDataToClient = async (ws: WebSocket) => {
+const sendDataToClient = async () => {
   try {
     const topPhrases = await getPhrases(true, 20);
     const bottomPhrases = await getPhrases(false, 20);
@@ -76,8 +62,13 @@ const sendDataToClient = async (ws: WebSocket) => {
     );
 
     if (topPhrasesChanged || bottomPhrasesChanged) {
+      const data = JSON.stringify({ top: topPhrases, bottom: bottomPhrases });
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(data);
+        }
+      });
       // Notify the WebSocket clients about the updated data
-      ws.send(JSON.stringify({ top: topPhrases, bottom: bottomPhrases }));
 
       // Update the previous phrases with the current ones
       previousTopPhrases = topPhrases;

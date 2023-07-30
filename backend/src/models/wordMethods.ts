@@ -4,7 +4,9 @@ export const saveOrUpdateWord = async (word: string, isPositive: boolean) => {
   try {
     const existingWord = await Word.findOne({ word });
     if (existingWord) {
-      existingWord.count += 1;
+      existingWord.count += isPositive ? 1 : -1;
+      await existingWord.save();
+      return existingWord;
     } else {
       return Word.create({ word });
     }

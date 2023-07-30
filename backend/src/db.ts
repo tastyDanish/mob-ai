@@ -1,6 +1,6 @@
 import mongoose, { ConnectOptions } from "mongoose";
 
-const MONGO_URI = "mongodb://localhost:27017/your_database_name";
+const MONGO_URI = "mongodb://127.0.0.1:27017/word_store";
 
 const connectDB = async () => {
   try {
