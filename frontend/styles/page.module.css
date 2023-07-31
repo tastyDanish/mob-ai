@@ -13,4 +13,21 @@
 }
 
 .submitConatiner {
+  position: relative;
+}
+
+.create::after {
+  content: "CREATE";
+  position: absolute;
+  color: black;
+  top: 100%;
+  left: 0;
+}
+
+.destroy::after {
+  content: "DESTROY";
+  position: absolute;
+  color: black;
+  top: 100%;
+  left: 0;
 }
