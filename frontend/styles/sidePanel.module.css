@@ -1,0 +1,9 @@
+.sidePanel {
+  width: 600px;
+  height: 60%;
+  position: absolute;
+  top: 20%;
+  left: -500px;
+  background-color: grey;
+  z-index: 100;
+}

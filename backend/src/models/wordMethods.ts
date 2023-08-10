@@ -29,3 +29,11 @@ export const getPhrases = async (isTop: boolean, limit: number) => {
     throw error;
   }
 };
+
+export const clearWords = async () => {
+  try {
+    const deleteResult = await Word.deleteMany({});
+  } catch (error) {
+    console.error("error deleteing words:", error);
+  }
+};

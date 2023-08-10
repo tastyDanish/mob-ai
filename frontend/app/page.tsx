@@ -5,9 +5,11 @@ import { addWord } from "@/api";
 import { useWords, WordsContextType } from "../context/WordsContext";
 import WordList from "@/components/WordList";
 import { motion, useAnimate } from "framer-motion";
+import SidePanel from "@/components/SidePanel";
+import CountDown from "@/components/Countdown";
 
 const Home = () => {
-  const { topWords, bottomWords }: WordsContextType = useWords();
+  const { topWords, bottomWords, endTime }: WordsContextType = useWords();
   const [text, setText] = useState("");
   const [positive, setPositive] = useState(true);
   const [scope, animate] = useAnimate();
@@ -33,6 +35,7 @@ const Home = () => {
 
   return (
     <main className={styles.main}>
+      <SidePanel />
       <div className={styles.artContainer}>
         <div onClick={() => setPositive(true)}>
           <h2>Top Words</h2>
@@ -56,6 +59,7 @@ const Home = () => {
         className={`${styles.submitContainer} ${
           positive ? styles.create : styles.destroy
         }`}>
+        <CountDown targetTimestamp={endTime} />
         <input
           ref={inputRef}
           value={text}
