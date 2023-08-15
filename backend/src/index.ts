@@ -1,20 +1,31 @@
+require("dotenv").config();
 import express, { Request, Response } from "express";
 import WebSocket from "ws";
 import cors from "cors";
-import connectDB from "./db";
-import { clearWords, getPhrases, saveOrUpdateWord } from "./models/wordMethods";
-import { WordDocument } from "./models/wordModel";
+import {
+  clearWords,
+  getBottomWords,
+  getTopWords,
+  saveOrUpdateWord,
+} from "./models/wordMethods";
 import { arraysAreEqual } from "./utils/arrayUtils";
-import { getLastGame, startGame } from "./models/gameMethods";
-import { GameDocument } from "./models/gameModel";
+import {
+  finishGame,
+  getLastCompletedGame,
+  getLastGame,
+  startGame,
+} from "./models/gameMethods";
 
-let previousTopPhrases: WordDocument[] = [];
-let previousBottomPhrases: WordDocument[] = [];
+interface word {
+  word: string;
+  count: number;
+}
+let previousTopPhrases: word[] = [];
+let previousBottomPhrases: word[] = [];
 
 const app = express();
 const port = 5001;
 const wss = new WebSocket.Server({ port: 5002 });
-connectDB();
 app.use(express.json());
 
 const corsOptions = {
@@ -25,15 +36,17 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-getLastGame(false).then((lastGame) => {
+getLastGame().then((lastGame) => {
   if (lastGame) {
-    const endMs = lastGame.endTime - Math.floor(Date.now() / 1000);
-    setTimeout(endGame, endMs * 1000);
+    const gameEnd = new Date(lastGame.end_time);
+    const currentTime = new Date();
+    const endMs = gameEnd.getTime() - currentTime.getTime();
+    if (endMs > 0) setTimeout(endGame, endMs);
   }
 });
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, World! This is the backend server.");
+  res.send("You've reached the API");
 });
 
 app.post("/words", async (req: Request, res: Response) => {
@@ -44,17 +57,16 @@ app.post("/words", async (req: Request, res: Response) => {
 
   try {
     const savedWord = await saveOrUpdateWord(word, isPositive);
-    const game = await getLastGame(false);
-    console.log("game found: ", game);
+    const game = await getLastGame();
     if (!game) {
       console.log("no game found... making one");
-      const gameDurationInSeconds = 1 * 60;
+      const gameDurationInSeconds = 1 * 30;
       const gameStartTimestamp = Math.floor(Date.now() / 1000);
       const gameEndTimestamp = gameStartTimestamp + gameDurationInSeconds;
 
       const game = await startGame(gameEndTimestamp);
       setTimeout(endGame, gameDurationInSeconds * 1000);
-      sendGameEndToClient(game.endTime);
+      sendGameEndToClient(game.end_time);
     }
     sendWordsToClient();
     return res.status(201).json(savedWord);
@@ -65,26 +77,21 @@ app.post("/words", async (req: Request, res: Response) => {
 });
 
 const endGame = async () => {
-  const game = await getLastGame(false);
-  if (game) {
-    game.topWords = await getPhrases(true, 10);
-    game.bottomWords = await getPhrases(false, 10);
-    game.imgUrl = "https://picsum.photos/200";
-    await game.save();
-    await clearWords();
-    await broadcast<GameDocument>("lastResult", game);
-  }
+  console.log("ending the game!");
+  const topWords = (await getTopWords(10)).map((s) => s.word);
+  const bottom_words = (await getBottomWords(10)).map((s) => s.word);
+  await finishGame(topWords, bottom_words, "");
+  await clearWords();
+  await sendWordsToClient();
 };
 
 wss.on("connection", (ws: WebSocket) => {
   console.log("websocket client connected");
 
-  sendWordsToClient();
-  getLastGame(true).then((lastGame) => {
-    if (lastGame) broadcast<GameDocument>("lastResult", lastGame);
-  });
-  getLastGame(false).then((currentGame) => {
-    if (currentGame) broadcast<number>("gameEnd", currentGame.endTime);
+  sendWordsToClient(true);
+
+  getLastGame().then((currentGame) => {
+    if (currentGame) broadcast<string>("gameEnd", currentGame.end_time);
   });
 });
 
@@ -97,18 +104,24 @@ const broadcast = <T>(messageType: string, data: T) => {
   });
 };
 
-const sendGameEndToClient = async (end: number) => {
+const sendGameEndToClient = async (end: string) => {
   try {
-    broadcast("gameEnd", { end });
+    broadcast("gameEnd", end);
   } catch (error) {
     console.log("error sending data to the client:", error);
   }
 };
 
-const sendWordsToClient = async () => {
+const sendWordsToClient = async (force: boolean = false) => {
   try {
-    const topPhrases = await getPhrases(true, 10);
-    const bottomPhrases = await getPhrases(false, 10);
+    const topPhrases: word[] = (await getTopWords(10)).map((s) => ({
+      word: s.word,
+      count: s.count,
+    }));
+    const bottomPhrases: word[] = (await getBottomWords(10)).map((s) => ({
+      word: s.word,
+      count: s.count,
+    }));
 
     // Compare new results with previous results
     const topPhrasesChanged = !arraysAreEqual(previousTopPhrases, topPhrases);
@@ -117,7 +130,7 @@ const sendWordsToClient = async () => {
       bottomPhrases
     );
 
-    if (topPhrasesChanged || bottomPhrasesChanged) {
+    if (topPhrasesChanged || bottomPhrasesChanged || force) {
       broadcast("wordUpdate", { top: topPhrases, bottom: bottomPhrases });
       previousTopPhrases = topPhrases;
       previousBottomPhrases = bottomPhrases;

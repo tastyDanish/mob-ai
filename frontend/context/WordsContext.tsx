@@ -22,7 +22,7 @@ export interface Game {
 export interface WordsContextType {
   topWords: Word[];
   bottomWords: Word[];
-  endTime: number | null;
+  endTime: string | null;
   lastResult: Game | null;
 }
 
@@ -50,7 +50,7 @@ export interface WordsProviderProps {
 export function WordsProvider({ children }: WordsProviderProps) {
   const [topWords, setTopWords] = useState<Word[]>([]);
   const [bottomWords, setBottomWords] = useState<Word[]>([]);
-  const [endTime, setEndTime] = useState<number | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<null | Game>(null);
 
   useEffect(() => {

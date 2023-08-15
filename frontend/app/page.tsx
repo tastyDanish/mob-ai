@@ -59,7 +59,7 @@ const Home = () => {
         className={`${styles.submitContainer} ${
           positive ? styles.create : styles.destroy
         }`}>
-        <CountDown targetTimestamp={endTime} />
+        {endTime && <CountDown timestamp={endTime} />}
         <input
           ref={inputRef}
           value={text}

@@ -1,47 +1,42 @@
 "use client";
 import { useEffect, useState } from "react";
-import styles from "../styles/countdown.module.css";
 
 export interface CountDownProps {
-  targetTimestamp: number | null;
+  timestamp: string;
 }
 
-const CountDown = ({ targetTimestamp }: CountDownProps) => {
-  const [remainingTime, setRemainingTime] = useState(
-    targetTimestamp ? targetTimestamp : 0
-  );
+const CountDown = ({ timestamp }: CountDownProps) => {
+  const targetTime =
+    new Date(timestamp).getTime() - new Date().getTimezoneOffset() * 60000;
+  const currentTime = new Date().getTime();
+  const timeRemaining = Math.max(targetTime - currentTime, 0);
+  const [timeLeft, setTimeLeft] = useState<number>(timeRemaining);
 
   useEffect(() => {
-    // Update the countdown every second
-    const timerInterval = setInterval(() => {
-      const currentTimestamp = Math.floor(Date.now() / 1000);
-      if (targetTimestamp) {
-        const newRemainingTime = targetTimestamp - currentTimestamp;
+    const intervalId = setInterval(() => {
+      const currentTime = new Date().getTime();
+      const timeRemaining = Math.max(targetTime - currentTime, 0);
 
-        // Check if the countdown is finished
-        if (newRemainingTime < 0) {
-          clearInterval(timerInterval);
-        } else {
-          setRemainingTime(newRemainingTime);
-        }
+      if (timeRemaining <= 0) {
+        clearInterval(intervalId);
       }
+
+      setTimeLeft(timeRemaining);
     }, 1000);
 
-    // Clean up the interval on unmount
-    return () => clearInterval(timerInterval);
-  }, [targetTimestamp]);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [timestamp]);
 
-  // Calculate remaining hours, minutes, and seconds
-  const minutes = Math.floor((remainingTime % 3600) / 60);
-  const seconds = remainingTime % 60;
+  const formatTime = (time: number): string => {
+    const seconds = Math.floor((time / 1000) % 60);
+    const minutes = Math.floor((time / 1000 / 60) % 60);
 
-  return (
-    targetTimestamp && (
-      <div className={styles.countdown}>
-        {minutes}m {seconds}s
-      </div>
-    )
-  );
+    return `${minutes}m ${seconds}s`;
+  };
+
+  return <div>{timeLeft > 0 && <p>Countdown: {formatTime(timeLeft)}</p>}</div>;
 };
 
 export default CountDown;
