@@ -30,9 +30,11 @@ const WordList = ({ isPositive }: WordListProps) => {
   const numberSort = (list: WordData[]) => {
     return list.sort((a, b) => {
       if (b.count !== a.count) {
-        return b.count - a.count;
+        return isPositive ? b.count - a.count : a.count - b.count;
       } else {
-        return a.word.localeCompare(b.word);
+        return isPositive
+          ? a.word.localeCompare(b.word)
+          : b.word.localeCompare(a.word);
       }
     });
   };
@@ -51,7 +53,7 @@ const WordList = ({ isPositive }: WordListProps) => {
       .from("words")
       .select("*")
       .filter("count", isPositive ? "gt" : "lte", 0)
-      .order("count", { ascending: false })
+      .order("count", { ascending: !isPositive })
       .limit(10)
       .then(({ data }) => {
         if (data) {
@@ -67,7 +69,12 @@ const WordList = ({ isPositive }: WordListProps) => {
       .channel(`${isPositive ? "top" : "bottom"}-words`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "words", filter: "count=gt.0" },
+        {
+          event: "*",
+          schema: "public",
+          table: "words",
+          filter: isPositive ? "count=gt.0" : "count=lte.0",
+        },
         (payload) => {
           if (payload.eventType === "INSERT" && words.length < 10) {
             replaceWord({ word: payload.new.word, count: payload.new.count });
