@@ -39,18 +39,12 @@ const Home = () => {
       <div className={styles.artContainer}>
         <div onClick={() => setPositive(true)}>
           <h2>Top Words</h2>
-          <WordList
-            words={topWords}
-            isPositive={true}
-          />
+          <WordList isPositive={true} />
         </div>
         <div style={{ height: 200, width: 0, background: "grey" }} />
         <div onClick={() => setPositive(false)}>
           <h2>Bottom Words</h2>
-          <WordList
-            words={bottomWords}
-            isPositive={false}
-          />
+          <WordList isPositive={false} />
         </div>
       </div>
 

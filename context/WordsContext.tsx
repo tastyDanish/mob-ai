@@ -53,39 +53,39 @@ export function WordsProvider({ children }: WordsProviderProps) {
   const [endTime, setEndTime] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<null | Game>(null);
 
-  useEffect(() => {
-    const ws = new WebSocket(websocketUrl);
+  // useEffect(() => {
+  //   const ws = new WebSocket(websocketUrl);
 
-    ws.onmessage = (event) => {
-      console.log("received message: ", event);
-      const data = JSON.parse(event.data);
-      const messageType = data.type;
-      const messageData = data.data;
+  //   ws.onmessage = (event) => {
+  //     console.log("received message: ", event);
+  //     const data = JSON.parse(event.data);
+  //     const messageType = data.type;
+  //     const messageData = data.data;
 
-      switch (messageType) {
-        case "wordUpdate":
-          const { top, bottom } = messageData;
-          setTopWords(top);
-          setBottomWords(bottom);
-          return;
-        case "gameEnd":
-          setEndTime(messageData);
-          return;
-        case "lastResult":
-          const { result } = messageData;
-          setLastResult(result);
-          setBottomWords([]);
-          setTopWords([]);
-          return;
-        default:
-          console.log("received unknown type");
-      }
-    };
+  //     switch (messageType) {
+  //       case "wordUpdate":
+  //         const { top, bottom } = messageData;
+  //         setTopWords(top);
+  //         setBottomWords(bottom);
+  //         return;
+  //       case "gameEnd":
+  //         setEndTime(messageData);
+  //         return;
+  //       case "lastResult":
+  //         const { result } = messageData;
+  //         setLastResult(result);
+  //         setBottomWords([]);
+  //         setTopWords([]);
+  //         return;
+  //       default:
+  //         console.log("received unknown type");
+  //     }
+  //   };
 
-    return () => {
-      ws.close();
-    };
-  }, []);
+  //   return () => {
+  //     ws.close();
+  //   };
+  // }, []);
 
   return (
     <WordsContext.Provider

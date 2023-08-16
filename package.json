@@ -1,13 +1,29 @@
 {
-  "name": "my-fullstack-app",
-  "version": "1.0.0",
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start:frontend": "cd frontend && npm run dev",
-    "start:backend": "cd backend && ts-node-dev --respawn src/index.ts",
-    "start:dev": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.32.0",
+    "@types/node": "20.4.5",
+    "@types/react": "18.2.17",
+    "@types/react-dom": "18.2.7",
+    "axios": "^1.4.0",
+    "eslint": "8.46.0",
+    "eslint-config-next": "13.4.12",
+    "framer-motion": "^10.15.0",
+    "moment": "^2.29.4",
+    "next": "13.4.12",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.1.6"
   },
   "devDependencies": {
-    "concurrently": "^6.2.2",
-    "ts-node-dev": "^1.1.8"
+    "encoding": "^0.1.13"
   }
 }

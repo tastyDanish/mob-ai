@@ -1,27 +1,28 @@
-import supabase from "../supabase";
+import supabase from "./supabase";
 
 export const saveOrUpdateWord = async (word: string, isPositive: boolean) => {
   try {
-    const { data, error } = await supabase
+    const { count, error } = await supabase
       .from("words")
-      .select("*")
-      .eq("word", word)
-      .limit(1)
-      .single();
-    if (data) {
-      const { data: updated, error } = await supabase
-        .from("words")
-        .update({ count: data.count + (isPositive ? 1 : -1) })
-        .eq("id", data.id);
-      return updated;
-    } else {
+      .select("*", { count: "exact", head: true })
+      .eq("word", word);
+    if (count && count > 0) {
       const { data, error } = await supabase
         .from("words")
-        .insert({ word: word, count: isPositive ? 1 : -1 })
-        .select()
+        .select("*")
+        .eq("word", word)
         .limit(1)
         .single();
-      return data;
+      if (data) {
+        const { error } = await supabase
+          .from("words")
+          .update({ count: data.count + (isPositive ? 1 : -1) })
+          .eq("id", data.id);
+      }
+    } else {
+      const { error } = await supabase
+        .from("words")
+        .insert({ word: word, count: isPositive ? 1 : -1 });
     }
   } catch (error) {
     console.error("Error saving or updating word:", error);

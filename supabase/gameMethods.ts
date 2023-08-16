@@ -1,4 +1,4 @@
-import supabase from "../supabase";
+import supabase from "./supabase";
 import { epochToTimestamp } from "../utils/dateUtils";
 
 export const startGame = async (end: number) => {
