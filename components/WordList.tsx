@@ -32,15 +32,20 @@ const WordList = ({ isPositive }: WordListProps) => {
       if (b.count !== a.count) {
         return isPositive ? b.count - a.count : a.count - b.count;
       } else {
-        return isPositive
-          ? a.word.localeCompare(b.word)
-          : b.word.localeCompare(a.word);
+        return a.word.localeCompare(b.word);
       }
     });
   };
 
   const replaceWord = (newWord: WordData) => {
     const filteredList = words.filter((s) => s.word !== newWord.word);
+    if (
+      (isPositive && newWord.count <= 0) ||
+      (!isPositive && newWord.count > 0)
+    ) {
+      setWords(filteredList);
+      return;
+    }
     const updatedList = numberSort([...filteredList, newWord]);
     if (updatedList.length > 10) {
       updatedList.splice(10);
@@ -73,9 +78,9 @@ const WordList = ({ isPositive }: WordListProps) => {
           event: "*",
           schema: "public",
           table: "words",
-          filter: isPositive ? "count=gt.0" : "count=lte.0",
         },
         (payload) => {
+          console.log("new payload: ", payload);
           if (payload.eventType === "INSERT" && words.length < 10) {
             replaceWord({ word: payload.new.word, count: payload.new.count });
           } else if (payload.eventType === "UPDATE") {
