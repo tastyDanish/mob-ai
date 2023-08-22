@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../styles/wordList.module.css";
-import { Word } from "@/context/WordsContext";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import supabase from "@/supabase/supabase";
 
 export interface WordListProps {
