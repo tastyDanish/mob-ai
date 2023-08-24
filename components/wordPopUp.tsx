@@ -9,13 +9,6 @@ export interface WordPopUp {
   killWord(wordId: string): void;
 }
 const WordPopUp = ({ word, isPositive, id, killWord }: WordPopUp) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      killWord(id);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [id, killWord]);
-
   const getRandomNumber = (isNegative: boolean): number => {
     let randomNumber = Math.floor(Math.random() * 150) + 1;
     if (!isNegative) {
@@ -34,7 +27,8 @@ const WordPopUp = ({ word, isPositive, id, killWord }: WordPopUp) => {
         y: isPositive ? -300 : 300,
         opacity: 0,
         transition: { duration: 2 },
-      }}>
+      }}
+      onAnimationComplete={() => killWord(id)}>
       {word}
     </motion.div>
   );
