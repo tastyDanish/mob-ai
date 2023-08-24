@@ -1,15 +1,15 @@
 "use client";
-import { LegacyRef, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "../styles/page.module.css";
 import { addWord } from "@/api";
 import { useWords, WordsContextType } from "../context/WordsContext";
 import WordList from "@/components/WordList";
 import { motion, useAnimate } from "framer-motion";
 import SidePanel from "@/components/SidePanel";
-import CountDown from "@/components/Countdown";
+import WordPipe from "@/components/WordPipe";
 
 const Home = () => {
-  const { topWords, bottomWords, endTime }: WordsContextType = useWords();
+  const { topWords, bottomWords }: WordsContextType = useWords();
   const [text, setText] = useState("");
   const [positive, setPositive] = useState(true);
   const [scope, animate] = useAnimate();
@@ -39,12 +39,18 @@ const Home = () => {
       <div className={styles.artContainer}>
         <div onClick={() => setPositive(true)}>
           <h2>Top Words</h2>
-          <WordList isPositive={true} />
+          <WordList
+            words={topWords}
+            isPositive={true}
+          />
         </div>
-        <div style={{ height: 200, width: 0, background: "grey" }} />
+        <WordPipe />
         <div onClick={() => setPositive(false)}>
           <h2>Bottom Words</h2>
-          <WordList isPositive={false} />
+          <WordList
+            words={bottomWords}
+            isPositive={false}
+          />
         </div>
       </div>
 
@@ -53,7 +59,6 @@ const Home = () => {
         className={`${styles.submitContainer} ${
           positive ? styles.create : styles.destroy
         }`}>
-        {endTime && <CountDown timestamp={endTime} />}
         <input
           ref={inputRef}
           value={text}

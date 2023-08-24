@@ -1,7 +1,6 @@
 .wordContainer {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 2px;
 }
 
@@ -9,13 +8,20 @@
   align-items: flex-end;
 }
 
+.negative {
+  align-items: flex-start;
+}
+
 .word {
-  background-color: lightcoral;
-  color: white;
   height: fit-content;
   width: fit-content;
   border-radius: 5px;
   padding: 3px 15px;
+}
+
+.negative .word {
+  background-color: lightcoral;
+  color: white;
 }
 
 .positive .word {
