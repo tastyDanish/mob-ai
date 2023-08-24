@@ -7,18 +7,20 @@
 
 .wordPopUp {
   position: absolute;
-  background-color: white;
   border-radius: 20px;
-  bottom: 0;
-  padding: 2px;
+  padding: 3px 15px;
 }
 
-.wordPopUp .positiveWord {
+.positiveWord {
   bottom: 0;
   left: 0;
+  background-color: lightgreen;
+  color: black;
 }
 
-.wordPopUp .negativeWord {
+.negativeWord {
   top: 0;
   right: 0;
+  background-color: lightcoral;
+  color: white;
 }

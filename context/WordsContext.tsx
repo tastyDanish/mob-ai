@@ -3,6 +3,7 @@ import supabase from "@/supabase/supabase";
 import React, {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -96,9 +97,12 @@ export function WordsProvider({ children }: WordsProviderProps) {
       });
   }, []);
 
-  const killWord = (id: string) => {
-    setNewWords(newWords.filter((s) => s.id != id));
-  };
+  const killWord = useCallback(
+    (id: string) => {
+      setNewWords((prevWords) => prevWords.filter((s) => s.id !== id));
+    },
+    [setNewWords]
+  );
 
   const replaceTopWord = (newWord: WordData) => {
     const filteredList = topWords.filter((s) => s.word !== newWord.word);

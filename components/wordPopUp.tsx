@@ -4,25 +4,37 @@ import { useEffect } from "react";
 
 export interface WordPopUp {
   word: string;
+  id: string;
   isPositive: boolean;
-  killWord(): void;
+  killWord(wordId: string): void;
 }
-const WordPopUp = ({ word, isPositive, killWord }: WordPopUp) => {
+const WordPopUp = ({ word, isPositive, id, killWord }: WordPopUp) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      killWord();
-    }, 600);
+      killWord(id);
+    }, 2000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [id, killWord]);
+
+  const getRandomNumber = (isNegative: boolean): number => {
+    let randomNumber = Math.floor(Math.random() * 150) + 1;
+    if (!isNegative) {
+      randomNumber *= -1;
+    }
+    return randomNumber;
+  };
 
   return (
     <motion.div
       className={`${styles.wordPopUp} ${
         isPositive ? styles.positiveWord : styles.negativeWord
       }`}
-      animate={{ y: isPositive ? -100 : 100, opacity: 1 }}
-      exit={{ y: isPositive ? -200 : 200, opacity: 0 }}
-      layout>
+      initial={{ x: getRandomNumber(isPositive) }}
+      animate={{
+        y: isPositive ? -300 : 300,
+        opacity: 0,
+        transition: { duration: 2 },
+      }}>
       {word}
     </motion.div>
   );

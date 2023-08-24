@@ -7,17 +7,16 @@ const WordPipe = () => {
   const { newWords, killWord } = useWords();
   return (
     <div className={styles.wordPipe}>
-      <AnimatePresence>
-        {newWords &&
-          newWords.map((word) => (
-            <WordPopUp
-              key={word.id}
-              word={word.word}
-              isPositive={word.isPositive}
-              killWord={() => killWord(word.id)}
-            />
-          ))}
-      </AnimatePresence>
+      {newWords &&
+        newWords.map((word) => (
+          <WordPopUp
+            key={word.id}
+            id={word.id}
+            word={word.word}
+            isPositive={word.isPositive}
+            killWord={killWord}
+          />
+        ))}
     </div>
   );
 };
