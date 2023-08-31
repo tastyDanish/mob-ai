@@ -2,14 +2,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3rem;
-  min-height: calc(100vh - 12rem);
+  padding-top: 100px;
+  height: 100%;
   gap: 20px;
+  width: 100%;
 }
 
 .artContainer {
+  padding-left: 80px;
+  position: relative;
   display: flex;
   flex-direction: row;
+  width: 100%;
+  justify-content: center;
+}
+
+.art {
+  max-width: 800px;
+  min-width: 400px;
+  width: 40%;
 }
 
 .submitConatiner {

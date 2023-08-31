@@ -26,7 +26,7 @@ const WordPopUp = ({ word, isPositive, id, killWord }: WordPopUp) => {
       animate={{
         y: isPositive ? -300 : 300,
         opacity: 0,
-        transition: { duration: 2 },
+        transition: { duration: 3 },
       }}
       onAnimationComplete={() => killWord(id)}>
       {word}

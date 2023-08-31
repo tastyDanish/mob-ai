@@ -20,6 +20,13 @@ const Home = () => {
     setText("");
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      setPositive(!positive);
+    }
+  };
+
   const handleKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       submit();
@@ -37,21 +44,17 @@ const Home = () => {
     <main className={styles.main}>
       <SidePanel />
       <div className={styles.artContainer}>
-        <div onClick={() => setPositive(true)}>
-          <h2>Top Words</h2>
-          <WordList
-            words={topWords}
-            isPositive={true}
-          />
+        <WordList
+          words={topWords}
+          isPositive={true}
+        />
+        <div className={styles.art}>
+          <WordPipe />
         </div>
-        <WordPipe />
-        <div onClick={() => setPositive(false)}>
-          <h2>Bottom Words</h2>
-          <WordList
-            words={bottomWords}
-            isPositive={false}
-          />
-        </div>
+        <WordList
+          words={bottomWords}
+          isPositive={false}
+        />
       </div>
 
       <motion.div
@@ -62,6 +65,7 @@ const Home = () => {
         <input
           ref={inputRef}
           value={text}
+          onKeyDown={handleKeyDown}
           onKeyUp={handleKeyUp}
           onChange={(e) => setText(e.target.value)}></input>
         <button
