@@ -1,6 +1,6 @@
 .wordPipe {
   position: relative;
-  height: 300px;
+  height: 100%;
 }
 
 .wordPopUp {
@@ -23,4 +23,37 @@
   right: 0;
   background-color: lightcoral;
   color: white;
+}
+
+.submitContainer {
+  position: absolute;
+  width: 200px;
+  top: 50%;
+  left: calc(50% - 150px);
+  border-radius: 3rem;
+  border: 2px solid black;
+  background: white;
+  padding: 10px 40px 10px 40px;
+}
+
+.submitContainer input {
+  width: 100%;
+  background: white;
+  border-bottom: 1px solid grey;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  outline: none;
+}
+
+.submitButton {
+  position: absolute;
+  background: darkslategrey;
+  color: white;
+  height: 20px;
+  width: 50px;
+  text-align: center;
+  padding: 5px;
+  top: calc(50% - 15px);
+  left: calc(50% - 30px);
 }

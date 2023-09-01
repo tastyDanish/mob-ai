@@ -10,7 +10,7 @@ export interface WordPopUp {
 }
 const WordPopUp = ({ word, isPositive, id, killWord }: WordPopUp) => {
   const getRandomNumber = (isNegative: boolean): number => {
-    let randomNumber = Math.floor(Math.random() * 150) + 1;
+    let randomNumber = Math.floor(Math.random() * 350) + 1;
     if (!isNegative) {
       randomNumber *= -1;
     }
@@ -24,9 +24,9 @@ const WordPopUp = ({ word, isPositive, id, killWord }: WordPopUp) => {
       }`}
       initial={{ x: getRandomNumber(isPositive) }}
       animate={{
-        y: isPositive ? -300 : 300,
-        opacity: 0,
-        transition: { duration: 3 },
+        y: isPositive ? -800 : 800,
+        opacity: 0.4,
+        transition: { duration: 5 },
       }}
       onAnimationComplete={() => killWord(id)}>
       {word}
