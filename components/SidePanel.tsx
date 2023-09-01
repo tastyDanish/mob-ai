@@ -75,20 +75,40 @@ const SidePanel = () => {
   };
 
   return (
-    <div
-      className={styles.sidePanel}
-      ref={scope}
-      onClick={(e) => handleClick(e, true)}>
-      {gameResult == null ? (
-        <div>loading...</div>
-      ) : (
-        <img
-          alt={"this is what you wanted"}
-          src={`${base}${gameResult.imgUrl}`}
+    <>
+      {expanded && (
+        <div
+          className={styles.overlay}
+          onClick={(e) => handleClick(e, false)}
         />
       )}
-      <button onClick={(e) => handleClick(e, false)}>close</button>
-    </div>
+
+      <div
+        className={styles.sidePanel}
+        ref={scope}
+        onClick={(e) => handleClick(e, true)}>
+        <button
+          className={styles.panelClose}
+          onClick={(e) => handleClick(e, false)}>
+          <Image
+            src="/close-icon.svg"
+            alt="Close"
+            height={30}
+            width={30}
+          />
+        </button>
+        <div>TOP WORDS</div>
+        <div>{gameResult?.topWords.join(", ")}</div>
+        <div>BOTTOM WORDS</div>
+        <div>{gameResult?.bottomWords.join(", ")}</div>
+        <Image
+          alt={"this is what you wanted"}
+          src={gameResult ? `${base}${gameResult.imgUrl}` : "/placeholder.png"}
+          width={572}
+          height={572}
+        />
+      </div>
+    </>
   );
 };
 
