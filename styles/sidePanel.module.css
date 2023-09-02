@@ -1,13 +1,14 @@
 .sidePanel {
   max-width: 600px;
   position: absolute;
-  top: 20%;
   left: -500px;
+  top: 30px;
   z-index: 100;
   display: flex;
   flex-direction: column;
   padding: 20px 10px 10px 10px;
   align-items: center;
+  max-height: 90%;
   z-index: 20;
 }
 

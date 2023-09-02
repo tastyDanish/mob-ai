@@ -34,3 +34,18 @@
   background-color: lightgreen;
   color: black;
 }
+
+.thumb {
+  position: absolute;
+  opacity: 0.4;
+  z-index: -1;
+}
+
+.thumbsUp {
+  transform: scaleX(-1);
+  margin-right: -250px;
+}
+
+.thumbsDown {
+  margin-left: -250px;
+}

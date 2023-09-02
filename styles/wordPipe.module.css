@@ -31,9 +31,10 @@
   top: 50%;
   left: calc(50% - 150px);
   border-radius: 3rem;
-  border: 2px solid black;
   background: white;
   padding: 10px 40px 10px 40px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
 
 .submitContainer input {
@@ -50,10 +51,11 @@
   position: absolute;
   background: darkslategrey;
   color: white;
-  height: 20px;
-  width: 50px;
-  text-align: center;
-  padding: 5px;
+  border-radius: 10px;
+  padding: 5px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   top: calc(50% - 15px);
   left: calc(50% - 30px);
 }

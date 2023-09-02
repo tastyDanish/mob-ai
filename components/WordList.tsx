@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "../styles/wordList.module.css";
-import { WordData, useWords } from "@/context/WordsContext";
+import { WordData } from "@/context/WordsContext";
+import Image from "next/image";
 
 export interface WordListProps {
   words: WordData[];

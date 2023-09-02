@@ -6,12 +6,14 @@ import WordList from "@/components/WordList";
 import { motion, useAnimate } from "framer-motion";
 import SidePanel from "@/components/SidePanel";
 import WordPipe from "@/components/WordPipe";
+import CronCountDown from "@/components/CronCountDown";
 
 const Home = () => {
   const { topWords, bottomWords }: WordsContextType = useWords();
 
   return (
     <main className={styles.main}>
+      <CronCountDown cronExpression="*/2 * * * *" />
       <SidePanel />
       <div className={styles.artContainer}>
         <WordList

@@ -66,7 +66,7 @@ const WordPipe = () => {
         <motion.div
           ref={buttonScope}
           className={styles.submitButton}>
-          {positive ? "create" : "destroy"}
+          <span>{positive ? "create" : "destroy"}</span>
         </motion.div>
       </motion.div>
     </div>
