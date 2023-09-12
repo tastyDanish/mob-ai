@@ -2,18 +2,14 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
-
-.positive {
+  min-width: 200px;
   align-items: flex-end;
   margin-top: 50px;
 }
 
-.negative {
-  align-items: flex-start;
-  flex-direction: column-reverse;
-  justify-self: flex-end;
-  margin-bottom: 50px;
+.wordContainer span {
+  text-align: center;
+  width: 100%;
 }
 
 .word {
@@ -23,15 +19,6 @@
   padding: 3px 15px;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
     rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-}
-
-.negative .word {
-  background-color: lightcoral;
-  color: white;
-}
-
-.positive .word {
-  background-color: lightgreen;
   color: black;
 }
 

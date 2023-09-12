@@ -24,9 +24,9 @@ function getRandomSeedPhrase(): string {
   return seedPhrases[randomIndex];
 }
 
-const createPrompt = (words: any) => {
+const createPrompt = (prompt: any, words: any) => {
   return (
-    getRandomSeedPhrase() +
+    prompt.phrase +
     " ((" +
     words[0].word +
     ")), " +
@@ -63,8 +63,7 @@ serve(async (req) => {
         },
       });
     }
-    console.log("creating image with these prompts:");
-    console.log(createPrompt(topwords));
+
     // now we delete all the words:
     const { error: wordDeleteError } = await supabase
       .from("words")
@@ -73,6 +72,23 @@ serve(async (req) => {
 
     if (wordDeleteError)
       console.error("error from deleting words: ", wordDeleteError);
+
+    const { data: seedPhrase, error: seedPhraseError } = await supabase
+      .from("seed")
+      .select("*")
+      .limit(1)
+      .single();
+
+    if (seedPhraseError)
+      console.log("had error with seedPhrase: ", seedPhraseError);
+
+    console.log("creating image with these prompts:");
+    console.log(createPrompt(seedPhrase, topwords));
+
+    const { error: newSeedError } = await supabase
+      .from("seed")
+      .update({ phrase: getRandomSeedPhrase() })
+      .eq("id", 1);
 
     const options = {
       method: "POST",
@@ -83,7 +99,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         input: {
-          prompt: createPrompt(topwords),
+          prompt: createPrompt(seedPhrase, topwords),
 
           negative_prompt:
             "child, childish, young, worst quality, low quality, lowres, monochrome, greyscale, multiple views, comic, sketch, watermark, plain background",
@@ -118,10 +134,11 @@ serve(async (req) => {
     console.log("here is storage data: ", data);
 
     const { error: gameInsertError } = await supabase.from("game").insert({
-      top_words: topwords.map((s) => s.word),
+      top_words: createPrompt(seedPhrase, topwords).split(","),
       img_url: data.path,
       game_round: 1,
     });
+
     if (gameInsertError)
       console.error("error from inserting new game: ", gameInsertError);
 

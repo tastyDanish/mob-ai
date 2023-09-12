@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "../styles/countdown.module.css";
 import cronParser from "cron-parser";
+import supabase from "@/supabase/supabase";
 
 interface CronCountdownProps {
   cronExpression: string;
@@ -8,6 +9,7 @@ interface CronCountdownProps {
 
 const CronCountDown = ({ cronExpression }: CronCountdownProps) => {
   const [progress, setProgress] = useState<number>(0);
+  const [seedPhrase, setSeedPhrase] = useState("");
 
   const GetProgress = () => {
     const interval = cronParser.parseExpression(cronExpression);
@@ -22,6 +24,31 @@ const CronCountDown = ({ cronExpression }: CronCountdownProps) => {
     );
     return progress;
   };
+
+  useEffect(() => {
+    supabase
+      .from("seed")
+      .select("*")
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setSeedPhrase(data.phrase ?? "");
+        }
+      });
+
+    const seedChannel = supabase.channel("seed-phrase").on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "words",
+      },
+      (payload) => {
+        console.log("change received: ", payload);
+      }
+    );
+  });
 
   useEffect(() => {
     try {
@@ -48,6 +75,7 @@ const CronCountDown = ({ cronExpression }: CronCountdownProps) => {
 
   return (
     <div className={styles.progressContainer}>
+      <div className={styles.seedPhrase}>Lets draw {seedPhrase}</div>
       <div
         className={styles.progress}
         style={{ width: `${progress}%` }}></div>

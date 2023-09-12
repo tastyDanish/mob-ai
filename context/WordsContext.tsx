@@ -54,13 +54,15 @@ export function WordsProvider({ children }: WordsProviderProps) {
   const [topWords, setTopWords] = useState<WordData[]>([]);
   const [newWords, setNewWords] = useState<NewWord[]>([]);
 
+  const NUMBER_LIMIT = 10;
+
   useEffect(() => {
     supabase
       .from("words")
       .select("*")
       .filter("count", "gt", 0)
       .order("count", { ascending: false })
-      .limit(5)
+      .limit(NUMBER_LIMIT)
       .then(({ data }) => {
         if (data) {
           setTopWords(
@@ -84,14 +86,14 @@ export function WordsProvider({ children }: WordsProviderProps) {
       return;
     }
     const updatedList = numberSort([...filteredList, newWord]);
-    if (updatedList.length > 5) {
-      updatedList.splice(5);
+    if (updatedList.length > NUMBER_LIMIT) {
+      updatedList.splice(NUMBER_LIMIT);
     }
     setTopWords(updatedList);
   };
 
   const newWordBelongs = (words: WordData[], newItem: WordData): boolean => {
-    if (words.length < 5) {
+    if (words.length < NUMBER_LIMIT) {
       return true;
     }
     if (words.filter((s) => s.word == newItem.word).length > 0) {

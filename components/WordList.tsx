@@ -5,25 +5,23 @@ import Image from "next/image";
 
 export interface WordListProps {
   words: WordData[];
-  isPositive: boolean;
 }
 
-const WordList = ({ words, isPositive }: WordListProps) => {
+const WordList = ({ words }: WordListProps) => {
   return (
-    <div
-      className={`${styles.wordContainer} ${
-        isPositive ? styles.positive : styles.negative
-      }`}>
+    <div className={styles.wordContainer}>
+      <span>TOP WORDS</span>
       <AnimatePresence mode="popLayout">
         {words &&
-          words.map((word) => (
+          words.map((word, i) => (
             <motion.div
               layout
               className={styles.word}
               key={word.word}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}>
+              exit={{ opacity: 0 }}
+              style={{ backgroundColor: i < 5 ? "lightgreen" : "lightblue" }}>
               {word.word}
             </motion.div>
           ))}

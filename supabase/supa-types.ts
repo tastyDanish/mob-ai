@@ -13,7 +13,7 @@ export interface Database {
         Row: {
           bottom_words: string[] | null
           created_at: string
-          end_time: string
+          game_round: number | null
           id: number
           img_url: string | null
           top_words: string[] | null
@@ -21,7 +21,7 @@ export interface Database {
         Insert: {
           bottom_words?: string[] | null
           created_at?: string
-          end_time: string
+          game_round?: number | null
           id?: number
           img_url?: string | null
           top_words?: string[] | null
@@ -29,10 +29,25 @@ export interface Database {
         Update: {
           bottom_words?: string[] | null
           created_at?: string
-          end_time?: string
+          game_round?: number | null
           id?: number
           img_url?: string | null
           top_words?: string[] | null
+        }
+        Relationships: []
+      }
+      seed: {
+        Row: {
+          id: number
+          phrase: string | null
+        }
+        Insert: {
+          id?: number
+          phrase?: string | null
+        }
+        Update: {
+          id?: number
+          phrase?: string | null
         }
         Relationships: []
       }
@@ -62,7 +77,28 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_word:
+        | {
+            Args: {
+              new_word: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              new_word: string
+              is_positive: boolean
+            }
+            Returns: string
+          }
+      advance_game_round: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      hello_world: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

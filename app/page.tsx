@@ -16,10 +16,7 @@ const Home = () => {
       <CronCountDown cronExpression="* * * * *" />
       <SidePanel />
       <div className={styles.artContainer}>
-        <WordList
-          words={topWords}
-          isPositive={true}
-        />
+        <WordList words={topWords} />
         <div className={styles.art}>
           <WordPipe />
         </div>

@@ -1,7 +1,6 @@
 .wordPipe {
   position: relative;
   height: 100%;
-  background: grey;
 }
 
 .wordPopUp {
@@ -30,7 +29,7 @@
   position: absolute;
   width: 200px;
   bottom: 20%;
-  right: calc(0% - 150px);
+  right: calc(0% + 100px);
   border-radius: 3rem;
   background: white;
   padding: 10px 40px 10px 40px;
