@@ -1,15 +1,6 @@
 import supabase from "./supabase";
 import { epochToTimestamp } from "../utils/dateUtils";
 
-export const startGame = async (end: number) => {
-  const { data, error } = await supabase
-    .from("game")
-    .insert({ end_time: epochToTimestamp(end) })
-    .select()
-    .single();
-  return data!;
-};
-
 export const getLastCompletedGame = async () => {
   const currentTime = Math.floor(Date.now() / 1000);
   const { data, error } = await supabase
