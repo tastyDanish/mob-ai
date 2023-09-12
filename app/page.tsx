@@ -9,11 +9,11 @@ import WordPipe from "@/components/WordPipe";
 import CronCountDown from "@/components/CronCountDown";
 
 const Home = () => {
-  const { topWords, bottomWords }: WordsContextType = useWords();
+  const { topWords }: WordsContextType = useWords();
 
   return (
     <main className={styles.main}>
-      <CronCountDown cronExpression="*/2 * * * *" />
+      <CronCountDown cronExpression="* * * * *" />
       <SidePanel />
       <div className={styles.artContainer}>
         <WordList
@@ -23,10 +23,6 @@ const Home = () => {
         <div className={styles.art}>
           <WordPipe />
         </div>
-        <WordList
-          words={bottomWords}
-          isPositive={false}
-        />
       </div>
     </main>
   );

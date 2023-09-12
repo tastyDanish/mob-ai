@@ -9,6 +9,37 @@ import * as uuid from "https://deno.land/std@0.194.0/uuid/mod.ts";
 
 const MAX_ROUNDS = 1;
 
+const seedPhrases: string[] = [
+  "(oil painting) of",
+  "(newspaper picture) of",
+  "(Photorealistic photography) of",
+  "(digital artwork) of",
+  "(vintage illustration) of",
+  "(watercolor depiction) of",
+];
+
+// Function to get a random seed phrase
+function getRandomSeedPhrase(): string {
+  const randomIndex = Math.floor(Math.random() * seedPhrases.length);
+  return seedPhrases[randomIndex];
+}
+
+const createPrompt = (words: any) => {
+  return (
+    getRandomSeedPhrase() +
+    " ((" +
+    words[0].word +
+    ")), " +
+    " (" +
+    words[1].word +
+    "), " +
+    words
+      .slice(2)
+      .map((s: any) => s.word)
+      .join(", ")
+  );
+};
+
 serve(async (req) => {
   try {
     const supabase = createClient(
@@ -21,18 +52,27 @@ serve(async (req) => {
       .select("*")
       .filter("count", "gt", 0)
       .order("count", { ascending: false })
-      .limit(10);
+      .limit(5);
 
-    const { data: bottomwords, error: bottomwordsError } = await supabase
-      .from("words")
-      .select("*")
-      .filter("count", "lte", 0)
-      .order("count", { ascending: true })
-      .limit(10);
-
+    if (topwords.length === 0) {
+      console.log("no top words, skipping creation");
+      return new Response(null, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+      });
+    }
     console.log("creating image with these prompts:");
-    console.log(topwords.map((s) => s.word).join(", "));
-    console.log(bottomwords.map((s) => s.word).join(", "));
+    console.log(createPrompt(topwords));
+    // now we delete all the words:
+    const { error: wordDeleteError } = await supabase
+      .from("words")
+      .delete()
+      .neq("id", 0);
+
+    if (wordDeleteError)
+      console.error("error from deleting words: ", wordDeleteError);
 
     const options = {
       method: "POST",
@@ -43,15 +83,17 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         input: {
-          prompt: topwords.map((s) => s.word).join(", "),
-          negative_prompt: bottomwords.map((s) => s.word).join(", "),
-          width: 512,
-          height: 512,
-          guidance_scale: 7.5,
-          num_inference_steps: 50,
+          prompt: createPrompt(topwords),
+
+          negative_prompt:
+            "child, childish, young, worst quality, low quality, lowres, monochrome, greyscale, multiple views, comic, sketch, watermark, plain background",
+          width: 576,
+          height: 768,
+          guidance_scale: 8,
+          num_inference_steps: 30,
           num_outputs: 1,
-          prompt_strength: 0.8,
-          scheduler: "K-LMS",
+          prompt_strength: 0.7,
+          scheduler: "PNDM",
         },
       }),
     };
@@ -77,7 +119,6 @@ serve(async (req) => {
 
     const { error: gameInsertError } = await supabase.from("game").insert({
       top_words: topwords.map((s) => s.word),
-      bottom_words: bottomwords.map((s) => s.word),
       img_url: data.path,
       game_round: 1,
     });

@@ -1,6 +1,6 @@
 import supabase from "./supabase";
 
-export const saveOrUpdateWord = async (word: string, isPositive: boolean) => {
+export const saveOrUpdateWord = async (word: string) => {
   try {
     const { count, error } = await supabase
       .from("words")
@@ -16,13 +16,13 @@ export const saveOrUpdateWord = async (word: string, isPositive: boolean) => {
       if (data) {
         const { error } = await supabase
           .from("words")
-          .update({ count: data.count + (isPositive ? 1 : -1) })
+          .update({ count: data.count + 1 })
           .eq("id", data.id);
       }
     } else {
       const { error } = await supabase
         .from("words")
-        .insert({ word: word, count: isPositive ? 1 : -1 });
+        .insert({ word: word, count: 1 });
     }
   } catch (error) {
     console.error("Error saving or updating word:", error);

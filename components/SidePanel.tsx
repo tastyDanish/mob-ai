@@ -8,7 +8,6 @@ import supabase from "@/supabase/supabase";
 interface GameResult {
   imgUrl: string;
   topWords: string[];
-  bottomWords: string[];
 }
 
 const base =
@@ -32,7 +31,6 @@ const SidePanel = () => {
           setGameResult({
             imgUrl: data.img_url!,
             topWords: data.top_words!,
-            bottomWords: data.bottom_words!,
           });
       });
 
@@ -46,7 +44,6 @@ const SidePanel = () => {
             setGameResult({
               imgUrl: payload.new.img_url!,
               topWords: payload.new.top_words!,
-              bottomWords: payload.new.bottom_words!,
             });
           }
         }
@@ -63,7 +60,7 @@ const SidePanel = () => {
       isInitialRender.current = false;
       return;
     }
-    animate(scope.current, { x: expanded ? 800 : 0 });
+    animate(scope.current, { x: expanded ? "100%" : 0 });
   }, [expanded]);
 
   const handleClick = (
@@ -99,13 +96,12 @@ const SidePanel = () => {
         </button>
         <div>TOP WORDS</div>
         <div>{gameResult?.topWords.join(", ")}</div>
-        <div>BOTTOM WORDS</div>
-        <div>{gameResult?.bottomWords.join(", ")}</div>
+
         <Image
           alt={"this is what you wanted"}
           src={gameResult ? `${base}${gameResult.imgUrl}` : "/placeholder.png"}
-          width={572}
-          height={572}
+          width={576}
+          height={768}
         />
       </div>
     </>

@@ -18,19 +18,16 @@ export interface WordData {
 export interface NewWord {
   word: string;
   id: string;
-  isPositive: boolean;
 }
 
 export interface WordsContextType {
   topWords: WordData[];
-  bottomWords: WordData[];
   newWords: NewWord[];
   killWord(id: string): void;
 }
 
 const defaultWordsContextValue: WordsContextType = {
   topWords: [],
-  bottomWords: [],
   newWords: [],
   killWord(id: string): void {},
 };
@@ -47,20 +44,15 @@ export interface WordsProviderProps {
   children: ReactNode;
 }
 
-const numberSort = (list: WordData[], isPositive: boolean) => {
+const numberSort = (list: WordData[]) => {
   return list.sort((a, b) => {
-    if (b.count !== a.count) {
-      return isPositive ? b.count - a.count : a.count - b.count;
-    } else {
-      return a.word.localeCompare(b.word);
-    }
+    return b.count - a.count;
   });
 };
 
 export function WordsProvider({ children }: WordsProviderProps) {
   const [topWords, setTopWords] = useState<WordData[]>([]);
   const [newWords, setNewWords] = useState<NewWord[]>([]);
-  const [bottomWords, setBottomWords] = useState<WordData[]>([]);
 
   useEffect(() => {
     supabase
@@ -68,30 +60,11 @@ export function WordsProvider({ children }: WordsProviderProps) {
       .select("*")
       .filter("count", "gt", 0)
       .order("count", { ascending: false })
-      .limit(10)
+      .limit(5)
       .then(({ data }) => {
         if (data) {
           setTopWords(
-            numberSort(
-              data.map((s) => ({ word: s.word, count: s.count })),
-              true
-            )
-          );
-        }
-      });
-    supabase
-      .from("words")
-      .select("*")
-      .filter("count", "lte", 0)
-      .order("count", { ascending: true })
-      .limit(10)
-      .then(({ data }) => {
-        if (data) {
-          setBottomWords(
-            numberSort(
-              data.map((s) => ({ word: s.word, count: s.count })),
-              false
-            )
+            numberSort(data.map((s) => ({ word: s.word, count: s.count })))
           );
         }
       });
@@ -110,43 +83,22 @@ export function WordsProvider({ children }: WordsProviderProps) {
       setTopWords(filteredList);
       return;
     }
-    const updatedList = numberSort([...filteredList, newWord], true);
-    if (updatedList.length > 10) {
-      updatedList.splice(10);
+    const updatedList = numberSort([...filteredList, newWord]);
+    if (updatedList.length > 5) {
+      updatedList.splice(5);
     }
     setTopWords(updatedList);
   };
 
-  const replaceBottomWord = (newWord: WordData) => {
-    const filteredList = bottomWords.filter((s) => s.word !== newWord.word);
-    if (newWord.count > 0) {
-      setBottomWords(filteredList);
-      return;
-    }
-    const updatedList = numberSort([...filteredList, newWord], false);
-    if (updatedList.length > 10) {
-      updatedList.splice(10);
-    }
-    setBottomWords(updatedList);
-  };
-
-  const newWordBelongs = (
-    words: WordData[],
-    newItem: WordData,
-    isPositive: boolean
-  ): boolean => {
-    if (words.length < 10) {
+  const newWordBelongs = (words: WordData[], newItem: WordData): boolean => {
+    if (words.length < 5) {
       return true;
     }
     if (words.filter((s) => s.word == newItem.word).length > 0) {
       return true;
     }
     const lastItem = words[words.length - 1];
-    if (isPositive) {
-      return newItem.count > lastItem.count;
-    } else {
-      return newItem.count < lastItem.count;
-    }
+    return newItem.count > lastItem.count;
   };
 
   useEffect(() => {
@@ -160,37 +112,20 @@ export function WordsProvider({ children }: WordsProviderProps) {
           table: "words",
         },
         (payload) => {
-          console.log("new payload: ", payload);
           if (payload.eventType === "DELETE") {
             setTopWords([]);
-            setBottomWords([]);
           } else if (payload.eventType === "INSERT") {
             const word = { word: payload.new.word, count: payload.new.count };
 
-            if (payload.new.count > 0) {
-              setNewWords([
-                ...newWords,
-                {
-                  word: payload.new.word,
-                  isPositive: true,
-                  id: uuidv4(),
-                },
-              ]);
-              if (newWordBelongs(topWords, word, true)) {
-                replaceTopWord(word);
-              }
-            } else {
-              setNewWords([
-                ...newWords,
-                {
-                  word: payload.new.word,
-                  isPositive: false,
-                  id: uuidv4(),
-                },
-              ]);
-              if (newWordBelongs(bottomWords, word, false)) {
-                replaceBottomWord(word);
-              }
+            setNewWords([
+              ...newWords,
+              {
+                word: payload.new.word,
+                id: uuidv4(),
+              },
+            ]);
+            if (newWordBelongs(topWords, word)) {
+              replaceTopWord(word);
             }
           } else if (payload.eventType === "UPDATE") {
             const word = { word: payload.new.word, count: payload.new.count };
@@ -198,16 +133,11 @@ export function WordsProvider({ children }: WordsProviderProps) {
               ...newWords,
               {
                 word: payload.new.word,
-                isPositive: payload.new.count > payload.old.count,
                 id: uuidv4(),
               },
             ]);
-            if (newWordBelongs(topWords, word, true)) {
+            if (newWordBelongs(topWords, word)) {
               replaceTopWord(word);
-            }
-
-            if (newWordBelongs(bottomWords, word, false)) {
-              replaceBottomWord(word);
             }
           }
         }
@@ -217,11 +147,10 @@ export function WordsProvider({ children }: WordsProviderProps) {
     return () => {
       supabase.removeChannel(wordChannel);
     };
-  }, [topWords, bottomWords, setNewWords, replaceTopWord, replaceBottomWord]);
+  }, [topWords, setNewWords, replaceTopWord]);
 
   return (
-    <WordsContext.Provider
-      value={{ topWords, bottomWords, newWords, killWord }}>
+    <WordsContext.Provider value={{ topWords, newWords, killWord }}>
       {children}
     </WordsContext.Provider>
   );

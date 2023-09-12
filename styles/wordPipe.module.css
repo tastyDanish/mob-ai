@@ -1,6 +1,7 @@
 .wordPipe {
   position: relative;
   height: 100%;
+  background: grey;
 }
 
 .wordPopUp {
@@ -28,8 +29,8 @@
 .submitContainer {
   position: absolute;
   width: 200px;
-  top: 50%;
-  left: calc(50% - 150px);
+  bottom: 20%;
+  right: calc(0% - 150px);
   border-radius: 3rem;
   background: white;
   padding: 10px 40px 10px 40px;
@@ -48,6 +49,7 @@
 }
 
 .submitButton {
+  left: 95%;
   position: absolute;
   background: darkslategrey;
   color: white;
@@ -57,5 +59,4 @@
   align-items: center;
   justify-content: center;
   top: calc(50% - 15px);
-  left: calc(50% - 30px);
 }
