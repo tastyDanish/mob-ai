@@ -16,6 +16,14 @@ const seedPhrases: string[] = [
   "(digital artwork) of",
   "(vintage illustration) of",
   "(watercolor depiction) of",
+  "(rage comic) of",
+  "(stone carving) of",
+  "(cave drawing) of",
+  "(Museum display) of",
+  "(impressionist portrait) of",
+  "(tv ad) of",
+  "(childrens game) of",
+  "(modern sculpture) of",
 ];
 
 // Function to get a random seed phrase
@@ -106,7 +114,7 @@ serve(async (req) => {
           width: 576,
           height: 768,
           guidance_scale: 8,
-          num_inference_steps: 30,
+          num_inference_steps: 40,
           num_outputs: 1,
           prompt_strength: 0.7,
           scheduler: "PNDM",
